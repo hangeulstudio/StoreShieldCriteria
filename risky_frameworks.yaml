@@ -1,0 +1,57 @@
+# StoreShield Risky Frameworks Policy
+#
+# OFFICIAL APPLE SOURCES:
+# - Third-Party SDK Requirements: https://developer.apple.com/support/third-party-SDK-requirements/
+# - App Store Review Guidelines 5.1.2: https://developer.apple.com/app-store/review/guidelines/#tracking
+# - Privacy Manifest Requirements: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+#
+# METHODOLOGY:
+# Apple does NOT provide an exhaustive list of tracking SDKs. This list is compiled from:
+# 1. SDKs explicitly mentioned in Apple's third-party SDK requirements page
+# 2. SDKs commonly flagged in App Store reviews (based on industry reports)
+# 3. SDKs mentioned in Apple WWDC sessions on privacy (2023-2024)
+# 4. SDKs that use tracking APIs (IDFA, etc.) per Apple's definition
+#
+# IMPORTANT: This is a curated list based on Apple's guidelines, not an official Apple list.
+# Apple requires Privacy Manifest for ANY SDK that uses tracking or sensitive APIs.
+#
+# Last verified: February 14, 2026
+# Next review: May 2026 (or when Apple updates requirements)
+#
+# Frameworks that require PrivacyInfo.xcprivacy manifest per Apple guidelines
+# These SDKs are known to use tracking or sensitive APIs that must be declared
+
+risky_frameworks:
+  # Analytics & Tracking SDKs (require NSPrivacyTracking: true in manifest)
+  - AppsFlyer
+  - FirebaseAnalytics
+  - GoogleAnalytics
+  - GoogleAnalyticsForFirebase
+  - FBSDKCoreKit
+  - FBSDKLoginKit
+  - Adjust
+  - Branch
+  - Mixpanel
+  - Amplitude
+  - Segment
+  - Braze
+  - CleverTap
+  
+  # Additional tracking SDKs
+  - OneSignal
+  - UrbanAirship
+  - Localytics
+  - Flurry
+  - Crashlytics
+  - Fabric
+  
+  # Advertising SDKs
+  - GoogleMobileAds
+  - AdMob
+  - FBAudienceNetwork
+  
+  # Note: This list is based on Apple's known tracking SDKs
+  # Apple requires Privacy Manifest for SDKs that:
+  # 1. Use tracking APIs (IDFA, etc.)
+  # 2. Access sensitive user data
+  # 3. Are distributed as binaries (not source code)

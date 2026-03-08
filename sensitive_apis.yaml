@@ -1,0 +1,90 @@
+# StoreShield Sensitive APIs Policy
+# 
+# OFFICIAL APPLE SOURCES:
+# - Required Reason API Types: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api
+# - Privacy Manifest Documentation: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+# - Required Reason Codes: Extracted from Apple's official documentation
+#
+# VERIFICATION:
+# All API types, reason codes, and symbols are extracted directly from Apple's official
+# Privacy Manifest documentation. Each entry has been verified against Apple's docs.
+#
+# Last verified: February 14, 2026
+# Next review: May 2026 (or when Apple updates documentation)
+#
+# These API categories must be declared in PrivacyInfo.xcprivacy with NSPrivacyAccessedAPITypes
+# Each category requires a "required reason" declaration per Apple guidelines
+
+sensitive_apis:
+  # Required Reason APIs (must be declared in PrivacyInfo.xcprivacy)
+  FileTimestamp:
+    symbols:
+      - creationDate
+      - modificationDate
+      - fileCreationDate
+      - NSFileCreationDate
+      - NSFileModificationDate
+    api_type: NSPrivacyAccessedAPITypeFileTimestamp
+    required_reason: C617.1
+    
+  SystemBootTime:
+    symbols:
+      - systemUptime
+      - bootTime
+      - mach_absolute_time
+      - NSProcessInfo.systemUptime
+    api_type: NSPrivacyAccessedAPITypeSystemBootTime
+    required_reason: 35F9.1
+    
+  DiskSpace:
+    symbols:
+      - systemFreeSize
+      - systemSize
+      - NSFileSystemFreeSize
+      - NSFileSystemSize
+      - volumeAvailableCapacity
+    api_type: NSPrivacyAccessedAPITypeDiskSpace
+    required_reason: E174.1
+    
+  ActiveKeyboards:
+    symbols:
+      - activeInputModes
+      - UITextInputMode
+      - UIKeyboard.activeInputModes
+    api_type: NSPrivacyAccessedAPITypeActiveKeyboards
+    required_reason: 54BD.1
+    
+  UserDefaults:
+    symbols:
+      - UserDefaults.standard.set
+      - UserDefaults.standard.object
+      - UserDefaults.standard.string
+      - UserDefaults.standard.bool
+    api_type: NSPrivacyAccessedAPITypeUserDefaults
+    required_reason: CA92.1
+  
+  # Privacy Permissions (not Required Reason APIs, but need proper declarations)
+  AdSupport:
+    symbols:
+      - ASIdentifierManager
+      - advertisingIdentifier
+      - isAdvertisingTrackingEnabled
+    api_type: PrivacyPermission
+    note: Requires App Tracking Transparency (ATT) framework
+    
+  CoreLocation:
+    symbols:
+      - CLLocationManager
+      - startUpdatingLocation
+      - requestLocation
+      - requestWhenInUseAuthorization
+    api_type: PrivacyPermission
+    note: Requires location permission in Info.plist
+    
+  HealthKit:
+    symbols:
+      - HKHealthStore
+      - HKWorkoutType
+      - requestAuthorization
+    api_type: PrivacyPermission
+    note: Requires HealthKit entitlement

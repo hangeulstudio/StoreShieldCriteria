@@ -1,0 +1,49 @@
+# StoreShield Risk Scoring Configuration
+#
+# OFFICIAL APPLE SOURCES:
+# - App Store Review Guidelines: https://developer.apple.com/app-store/review/guidelines/
+# - Third-Party SDK Requirements: https://developer.apple.com/support/third-party-SDK-requirements/
+# - Privacy Manifest Documentation: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+#
+# METHODOLOGY:
+# Scores are based on Apple's enforcement priorities as stated in their documentation:
+# - Missing main manifest = Automatic rejection (per Apple requirements)
+# - Missing framework manifests = Warning, potential rejection (per Apple requirements)
+# - Risky SDKs without declaration = Review flag (per App Store Review Guidelines 5.1.2)
+# - Sensitive APIs without required reason = Potential rejection (per Privacy Manifest docs)
+#
+# Last verified: February 14, 2026
+# Next review: May 2026
+#
+# Risk weights reflect Apple's enforcement priorities:
+# - Missing Privacy Manifest = Automatic rejection (HIGH)
+# - Missing framework manifests = Warning, potential rejection (MEDIUM)
+# - Risky SDKs without declaration = Review flag (MEDIUM)
+# - Sensitive APIs without required reason = Potential rejection (HIGH)
+
+risk_weights:
+  # Missing manifest per framework (Apple requires all third-party SDKs to have manifests)
+  missing_manifest_per_framework: 3
+  
+  # No main app manifest (Apple requirement - automatic rejection)
+  no_main_manifest: 10
+  
+  # Risky framework detected (needs declaration in App Store Connect)
+  risky_framework_per_sdk: 2
+  
+  # Sensitive API detected (must have required reason in manifest)
+  sensitive_api_per_detection: 2
+  
+  # Accessibility Nutrition Labels: needs attention when scan run with --accessibility-nutrition-labels
+  # (e.g. app forces Light only, or Info.plist missing). Optional check; only applied when requested.
+  accessibility_nutrition_needs_attention: 2
+
+# Risk thresholds based on Apple's review process:
+# - HIGH (≥10): Likely rejection, critical issues
+# - MEDIUM (≥5): Warning, may cause rejection
+# - LOW (<5): Compliant or minor issues
+
+risk_thresholds:
+  high: 10
+  medium: 5
+  low: 0
