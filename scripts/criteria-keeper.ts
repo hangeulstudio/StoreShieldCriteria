@@ -361,7 +361,7 @@ ${sdkSignals}
 Analyze the above. Produce the JSON output as specified. If nothing has changed in Apple's docs, return an empty changes array with a no_changes_reason.`;
 
   const message = await client.messages.create({
-    model: "claude-opus-4-5",
+    model: "claude-sonnet-4-5",
     max_tokens: 4096,
     system: systemPrompt,
     messages: [{ role: "user", content: userPrompt }],
