@@ -29,27 +29,32 @@ const CRITERIA_FILES = [
   "risk_scoring.yaml",
 ] as const;
 
-const APPLE_SOURCES = {
+// Apple documentation JSON API (server-side rendered — avoids JS requirement of HTML pages)
+const APPLE_JSON_SOURCES = {
   requiredReasonAPI:
-    "https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api",
+    "https://developer.apple.com/tutorials/data/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api.json",
+  privacyManifest:
+    "https://developer.apple.com/tutorials/data/documentation/bundleresources/privacy_manifest_files.json",
+};
+
+// Plain HTML sources (not SPA — fetch works)
+const APPLE_HTML_SOURCES = {
   thirdPartySDKs:
     "https://developer.apple.com/support/third-party-SDK-requirements/",
   reviewGuidelines:
     "https://developer.apple.com/app-store/review/guidelines/",
-  privacyManifest:
-    "https://developer.apple.com/documentation/bundleresources/privacy_manifest_files",
   developerNews: "https://developer.apple.com/news/releases/",
 };
 
 const COMMUNITY_RSS = [
   {
     name: "RevenueCat Blog",
-    url: "https://www.revenuecat.com/blog/feed.xml",
+    url: "https://www.revenuecat.com/blog/rss.xml",
     filter: ["privacy", "app store", "rejection", "manifest", "sdk"],
   },
   {
     name: "Emerge Tools Blog",
-    url: "https://www.emergetools.com/blog/feed.xml",
+    url: "https://www.emergetools.com/rss.xml",
     filter: ["privacy", "app store", "binary", "sdk", "api"],
   },
   {
@@ -197,15 +202,47 @@ function loadCurrentCriteria(): Record<string, unknown> {
 // Scrape Apple sources
 // ---------------------------------------------------------------------------
 
+/** Extract readable text from Apple's documentation JSON format. */
+function extractAppleDocText(obj: unknown): string {
+  if (typeof obj === "string") return obj;
+  if (Array.isArray(obj)) return obj.map(extractAppleDocText).join(" ");
+  if (obj && typeof obj === "object") {
+    const o = obj as Record<string, unknown>;
+    // Prefer code voice verbatim
+    if (o["type"] === "codeVoice" && typeof o["code"] === "string") return o["code"];
+    return Object.values(o)
+      .filter((v) => typeof v === "string" || Array.isArray(v) || (v && typeof v === "object"))
+      .map(extractAppleDocText)
+      .join(" ");
+  }
+  return "";
+}
+
 async function scrapeAppleSources(): Promise<string> {
   log("Scraping Apple Tier 1 sources…");
   const parts: string[] = [];
 
-  for (const [name, url] of Object.entries(APPLE_SOURCES)) {
+  // JSON API sources (full content, no JS needed)
+  for (const [name, url] of Object.entries(APPLE_JSON_SOURCES)) {
+    const raw = await safeFetchText(url);
+    if (!raw) { parts.push(`### ${name}\n[fetch failed]\n`); continue; }
+    try {
+      const json = JSON.parse(raw);
+      const text = extractAppleDocText(json.primaryContentSections ?? json)
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 10000);
+      parts.push(`### ${name}\nURL: ${url}\n\n${text}\n`);
+      log(`  ✓ ${name} JSON (${text.length} chars)`);
+    } catch {
+      parts.push(`### ${name}\n[JSON parse failed]\n`);
+    }
+  }
+
+  // HTML sources (simpler pages that don't require JS)
+  for (const [name, url] of Object.entries(APPLE_HTML_SOURCES)) {
     const html = await safeFetchText(url);
     if (!html) { parts.push(`### ${name}\n[fetch failed]\n`); continue; }
-
-    // Strip HTML tags, collapse whitespace, keep first 8000 chars
     const text = html
       .replace(/<script[\s\S]*?<\/script>/gi, "")
       .replace(/<style[\s\S]*?<\/style>/gi, "")
@@ -213,9 +250,8 @@ async function scrapeAppleSources(): Promise<string> {
       .replace(/\s+/g, " ")
       .trim()
       .slice(0, 8000);
-
     parts.push(`### ${name}\nURL: ${url}\n\n${text}\n`);
-    log(`  ✓ ${name} (${text.length} chars)`);
+    log(`  ✓ ${name} HTML (${text.length} chars)`);
   }
 
   return parts.join("\n---\n");
