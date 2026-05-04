@@ -1,5 +1,11 @@
 {
-  "version": "2026.2.0",
-  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.2.0/criteria.zip",
-  "changelog": "Initial release. risk_scoring, risky_frameworks, sensitive_apis."
+  "manifest_version": "2",
+  "version": "2026.3.0",
+  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.3.0/criteria.zip",
+  "checksums": {
+    "sensitive_apis.yaml":   "sha256:d02a3b2305349be462271133e325e7ca17d28e80d5f22ea0419c9b0e16ec38e7",
+    "risky_frameworks.yaml": "sha256:7709e261a4c3dd63b89aba2bef1513089aa5e8676230c60243906fbc3c29ec30",
+    "risk_scoring.yaml":     "sha256:4e47aaef2e25eac5109c8da65f56f633e3106df3fc626bed1fc1cf62765afd51"
+  },
+  "changelog": "manifest_version 2: per-file sha256 checksums. Criteria files unchanged (2026.2.0 content)."
 }

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/hangeulstudio/StoreShieldCriteria/schemas/risk_scoring.schema.json",
+  "title": "StoreShield Risk Scoring",
+  "description": "Schema for risk_scoring.yaml — point weights and thresholds.",
+  "type": "object",
+  "required": ["risk_weights", "risk_thresholds"],
+  "additionalProperties": false,
+  "properties": {
+    "risk_weights": {
+      "type": "object",
+      "description": "Point weights per finding type.",
+      "required": [
+        "missing_manifest_per_framework",
+        "no_main_manifest",
+        "risky_framework_per_sdk",
+        "sensitive_api_per_detection"
+      ],
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "risk_thresholds": {
+      "type": "object",
+      "description": "Score thresholds for risk levels.",
+      "required": ["high", "medium"],
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    }
+  }
+}

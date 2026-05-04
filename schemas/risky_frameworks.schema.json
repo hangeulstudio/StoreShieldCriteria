@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/hangeulstudio/StoreShieldCriteria/schemas/risky_frameworks.schema.json",
+  "title": "StoreShield Risky Frameworks",
+  "description": "Schema for risky_frameworks.yaml — SDKs that require a Privacy Manifest.",
+  "type": "object",
+  "required": ["risky_frameworks"],
+  "additionalProperties": false,
+  "properties": {
+    "risky_frameworks": {
+      "type": "array",
+      "description": "Framework/SDK names that trigger a privacy manifest warning.",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

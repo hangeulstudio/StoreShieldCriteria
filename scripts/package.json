@@ -1,0 +1,19 @@
+{
+  "name": "criteria-keeper",
+  "version": "1.0.0",
+  "description": "Criteria Keeper — auto-update StoreShield criteria from Apple sources",
+  "type": "module",
+  "scripts": {
+    "start": "bun run criteria-keeper.ts",
+    "validate": "bun run validate-schemas.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "js-yaml": "^4.1.0",
+    "ajv": "^8.17.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0"
+  }
+}

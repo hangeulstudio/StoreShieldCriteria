@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/hangeulstudio/StoreShieldCriteria/schemas/sensitive_apis.schema.json",
+  "title": "StoreShield Sensitive APIs",
+  "description": "Schema for sensitive_apis.yaml — Required Reason API declarations.",
+  "type": "object",
+  "required": ["sensitive_apis"],
+  "additionalProperties": false,
+  "properties": {
+    "sensitive_apis": {
+      "type": "object",
+      "description": "Map of API bucket name → entry.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/definitions/SensitiveAPIEntry"
+      }
+    }
+  },
+  "definitions": {
+    "SensitiveAPIEntry": {
+      "type": "object",
+      "required": ["symbols"],
+      "additionalProperties": false,
+      "properties": {
+        "symbols": {
+          "type": "array",
+          "description": "Symbol names that trigger this API bucket.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "api_type": {
+          "type": "string",
+          "description": "NSPrivacyAccessedAPIType* value declared in PrivacyInfo.xcprivacy.",
+          "pattern": "^NSPrivacyAccessedAPIType"
+        },
+        "required_reason": {
+          "type": "string",
+          "description": "Comma-separated Apple reason codes (e.g. 'C617.1' or 'C617.1, 35F9.1').",
+          "pattern": "^[A-Z0-9]{4}\\.[0-9]+(,\\s*[A-Z0-9]{4}\\.[0-9]+)*$"
+        }
+      }
+    }
+  }
+}

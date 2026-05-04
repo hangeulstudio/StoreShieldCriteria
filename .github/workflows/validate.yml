@@ -1,0 +1,46 @@
+name: Validate Criteria
+
+on:
+  push:
+    paths:
+      - "*.yaml"
+      - "manifest.json"
+      - "schemas/**"
+  pull_request:
+    paths:
+      - "*.yaml"
+      - "manifest.json"
+      - "schemas/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - name: Install dependencies
+        working-directory: scripts
+        run: bun install
+      - name: Validate YAML schemas
+        working-directory: scripts
+        run: bun run validate
+      - name: Verify manifest checksums
+        run: |
+          node -e "
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const manifest = JSON.parse(fs.readFileSync('manifest.json','utf8'));
+          const checksums = manifest.checksums || {};
+          let ok = true;
+          for (const [file, expected] of Object.entries(checksums)) {
+            const content = fs.readFileSync(file, 'utf8');
+            const actual = 'sha256:' + crypto.createHash('sha256').update(content,'utf8').digest('hex');
+            if (actual !== expected) {
+              console.error('FAIL ' + file + ': expected ' + expected + ' got ' + actual);
+              ok = false;
+            } else {
+              console.log('OK ' + file);
+            }
+          }
+          if (!ok) process.exit(1);
+          "
