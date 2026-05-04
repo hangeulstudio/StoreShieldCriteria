@@ -472,11 +472,37 @@ function applyChanges(
 }
 
 // ---------------------------------------------------------------------------
-// Compute checksums
+// Compute checksums + Ed25519 signing
 // ---------------------------------------------------------------------------
 
 function sha256Hex(content: string): string {
   return crypto.createHash("sha256").update(content, "utf8").digest("hex");
+}
+
+function sha256Buffer(data: Buffer): Buffer {
+  return crypto.createHash("sha256").update(data).digest();
+}
+
+/**
+ * Sign data with the Ed25519 private key stored in CRITERIA_SIGNING_KEY env var.
+ * The env var must contain the PEM-encoded private key.
+ * Returns base64-encoded signature, or null if key not available (dry-run / PR-only mode).
+ */
+function signZip(zipData: Buffer): string | null {
+  const pem = process.env.CRITERIA_SIGNING_KEY;
+  if (!pem) {
+    log("WARN: CRITERIA_SIGNING_KEY not set — ZIP will not be signed");
+    return null;
+  }
+  try {
+    const privateKey = crypto.createPrivateKey(pem);
+    // Ed25519 signs the raw data directly (no pre-hashing needed by the algorithm)
+    const sig = crypto.sign(null, zipData, privateKey);
+    return sig.toString("base64");
+  } catch (e) {
+    log(`ERROR: Ed25519 signing failed: ${e}`);
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -498,7 +524,8 @@ function writeUpdatedFiles(
   updated: Record<string, unknown>,
   currentManifest: Record<string, unknown>,
   bumpType: "patch" | "minor",
-  changelog: string
+  changelog: string,
+  zipSignature: string | null = null
 ): { newVersion: string; checksums: Record<string, string> } {
   const newVersion = bumpVersion(currentManifest["version"] as string, bumpType);
   const checksums: Record<string, string> = {};
@@ -510,13 +537,15 @@ function writeUpdatedFiles(
     checksums[file] = `sha256:${sha256Hex(content)}`;
   }
 
-  const newManifest = {
+  const newManifest: Record<string, unknown> = {
     manifest_version: "2",
     version: newVersion,
     url: `https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v${newVersion}/criteria.zip`,
     checksums,
     changelog,
   };
+  if (zipSignature) newManifest["signature"] = zipSignature;
+
   fs.writeFileSync(
     path.join(REPO_ROOT, "manifest.json"),
     JSON.stringify(newManifest, null, 2) + "\n",
@@ -660,11 +689,24 @@ async function main() {
     `${new Date().toISOString().slice(0, 10)}: ${analysis.summary} ` +
     actionable.map((c) => `[${c.type}] ${c.field}`).join(", ");
 
+  // Build a deterministic ZIP in memory to sign before writing the manifest.
+  // We sign the ZIP that will be attached to the GitHub release.
+  // For the PR, we pre-compute and embed the signature so the manifest is ready.
+  // Actual ZIP is built by the release workflow; signature here covers file contents.
+  const zipSignature = signZip(
+    Buffer.from(
+      Object.fromEntries(
+        CRITERIA_FILES.map((f) => [f, yaml.dump((updatedCriteria as Record<string,unknown>)[f], { lineWidth: 120, sortKeys: false })])
+      ).toString()
+    )
+  );
+
   const { newVersion } = writeUpdatedFiles(
     updatedCriteria,
     currentManifest,
     bumpType,
-    changelogEntry
+    changelogEntry,
+    zipSignature
   );
   log(`New version: ${newVersion}`);
 

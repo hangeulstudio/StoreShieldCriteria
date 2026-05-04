@@ -46,6 +46,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           FORCE_PR: ${{ inputs.force_pr || 'false' }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          CRITERIA_SIGNING_KEY: ${{ secrets.CRITERIA_SIGNING_KEY }}
         run: bun run criteria-keeper.ts
 
       - name: Upload run log
