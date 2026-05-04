@@ -1,0 +1,90 @@
+name: Release Criteria
+
+# Fires when manifest.json is updated on main (bot PR merge or manual push).
+# Reads the version from manifest, packages YAML files into criteria.zip,
+# creates a GitHub release, and uploads the zip as a release asset.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - manifest.json
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (leave blank to read from manifest.json)"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from manifest
+        id: meta
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION=$(jq -r '.version' manifest.json)
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check release does not already exist
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release $TAG already exists — skipping."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build criteria.zip
+        if: steps.check.outputs.exists != 'true'
+        run: |
+          mkdir -p dist
+          zip -j dist/criteria.zip sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml
+          echo "ZIP contents:"
+          unzip -l dist/criteria.zip
+
+      - name: Verify SHA-256 matches manifest checksums
+        if: steps.check.outputs.exists != 'true'
+        run: |
+          for f in sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml; do
+            expected=$(jq -r --arg f "$f" '.checksums[$f] // empty' manifest.json | sed 's/^sha256://')
+            if [ -z "$expected" ]; then
+              echo "No checksum for $f in manifest — skipping"
+              continue
+            fi
+            actual=$(sha256sum "$f" | awk '{print $1}')
+            if [ "$actual" != "$expected" ]; then
+              echo "CHECKSUM MISMATCH for $f: expected=$expected actual=$actual"
+              exit 1
+            fi
+            echo "✓ $f checksum OK"
+          done
+
+      - name: Create GitHub release
+        if: steps.check.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+          CHANGELOG=$(jq -r '.changelog // "Criteria update"' manifest.json)
+          gh release create "$TAG" \
+            --title "Criteria $VERSION" \
+            --notes "$CHANGELOG" \
+            dist/criteria.zip
+          echo "✓ Release $TAG created"
