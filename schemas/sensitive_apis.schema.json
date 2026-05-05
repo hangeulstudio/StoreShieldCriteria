@@ -31,13 +31,16 @@
         },
         "api_type": {
           "type": "string",
-          "description": "NSPrivacyAccessedAPIType* value declared in PrivacyInfo.xcprivacy.",
-          "pattern": "^NSPrivacyAccessedAPIType"
+          "description": "NSPrivacyAccessedAPIType* value for Required Reason APIs, or 'PrivacyPermission' for ATT/permission-gated APIs."
         },
         "required_reason": {
           "type": "string",
           "description": "Comma-separated Apple reason codes (e.g. 'C617.1' or 'C617.1, 35F9.1').",
           "pattern": "^[A-Z0-9]{4}\\.[0-9]+(,\\s*[A-Z0-9]{4}\\.[0-9]+)*$"
+        },
+        "note": {
+          "type": "string",
+          "description": "Human-readable note about this API entry."
         }
       }
     }
