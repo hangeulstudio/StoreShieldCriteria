@@ -1,90 +1,131 @@
 # StoreShield Sensitive APIs Policy
-# 
+#
 # OFFICIAL APPLE SOURCES:
-# - Required Reason API Types: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api
-# - Privacy Manifest Documentation: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
-# - Required Reason Codes: Extracted from Apple's official documentation
+# - Required Reason API: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api
+# - Privacy Manifest format: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
 #
-# VERIFICATION:
-# All API types, reason codes, and symbols are extracted directly from Apple's official
-# Privacy Manifest documentation. Each entry has been verified against Apple's docs.
+# IMPORTANT: The NSPrivacyAccessedAPIType plist KEY stores values prefixed with
+# NSPrivacyAccessedAPICategory* (NOT NSPrivacyAccessedAPIType*).
+# Example plist entry:
+#   <key>NSPrivacyAccessedAPIType</key>
+#   <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
 #
-# Last verified: February 14, 2026
-# Next review: May 2026 (or when Apple updates documentation)
-#
-# These API categories must be declared in PrivacyInfo.xcprivacy with NSPrivacyAccessedAPITypes
-# Each category requires a "required reason" declaration per Apple guidelines
+# Last verified: May 2026 against Apple developer documentation.
 
 sensitive_apis:
+  # ──────────────────────────────────────────────────────────────────────────
   # Required Reason APIs (must be declared in PrivacyInfo.xcprivacy)
+  # These 5 categories are Apple's official Required Reason API types.
+  # ──────────────────────────────────────────────────────────────────────────
+
   FileTimestamp:
     symbols:
+      # Swift / Objective-C API names
       - creationDate
       - modificationDate
       - fileCreationDate
+      - fileModificationDate
+      - contentModificationDate
+      - contentModificationDateKey
+      - creationDateKey
+      # Objective-C string constants
       - NSFileCreationDate
       - NSFileModificationDate
-    api_type: NSPrivacyAccessedAPITypeFileTimestamp
-    required_reason: C617.1
-    
+      - NSURLCreationDateKey
+      - NSURLContentModificationDateKey
+      # UIKit
+      - UIDocument
+      # C-level syscalls (stat family)
+      - getattrlist
+      - getattrlistbulk
+      - fgetattrlist
+      - getattrlistat
+    api_type: NSPrivacyAccessedAPICategoryFileTimestamp
+    required_reason: C617.1,3B52.1,DDA9.1,0A2A.1
+
   SystemBootTime:
     symbols:
+      # Swift / Foundation
       - systemUptime
-      - bootTime
+      - ProcessInfo.systemUptime
+      # C-level
       - mach_absolute_time
-      - NSProcessInfo.systemUptime
-    api_type: NSPrivacyAccessedAPITypeSystemBootTime
-    required_reason: 35F9.1
-    
+      # sysctl-based (common heuristic in analytics SDKs)
+      - bootTime
+      - KERN_BOOTTIME
+    api_type: NSPrivacyAccessedAPICategorySystemBootTime
+    required_reason: 35F9.1,8FFB.1,3D61.1
+
   DiskSpace:
     symbols:
+      # URLResourceKey (Swift)
+      - volumeAvailableCapacity
+      - volumeAvailableCapacityForImportantUsage
+      - volumeAvailableCapacityForOpportunisticUsage
+      - volumeTotalCapacity
+      # FileAttributeKey (Swift / Foundation)
       - systemFreeSize
       - systemSize
+      # Objective-C string constants
       - NSFileSystemFreeSize
       - NSFileSystemSize
-      - volumeAvailableCapacity
-    api_type: NSPrivacyAccessedAPITypeDiskSpace
-    required_reason: E174.1
-    
+      - NSURLVolumeAvailableCapacityKey
+      - NSURLVolumeAvailableCapacityForImportantUsageKey
+      - NSURLVolumeAvailableCapacityForOpportunisticUsageKey
+      - NSURLVolumeTotalCapacityKey
+      # C-level syscalls
+      - statfs
+      - statvfs
+      - fstatfs
+      - fstatvfs
+    api_type: NSPrivacyAccessedAPICategoryDiskSpace
+    required_reason: E174.1,85F4.1,7D9E.1,B728.1
+
   ActiveKeyboards:
     symbols:
+      # The only official triggering symbol per Apple docs
       - activeInputModes
       - UITextInputMode
-      - UIKeyboard.activeInputModes
-    api_type: NSPrivacyAccessedAPITypeActiveKeyboards
-    required_reason: 54BD.1
-    
+    api_type: NSPrivacyAccessedAPICategoryActiveKeyboards
+    required_reason: 54BD.1,3EC4.1
+
   UserDefaults:
     symbols:
-      - UserDefaults.standard.set
-      - UserDefaults.standard.object
-      - UserDefaults.standard.string
-      - UserDefaults.standard.bool
-    api_type: NSPrivacyAccessedAPITypeUserDefaults
-    required_reason: CA92.1
-  
-  # Privacy Permissions (not Required Reason APIs, but need proper declarations)
+      # Swift class name (any usage in binary will appear as symbol)
+      - UserDefaults
+      # Objective-C equivalent
+      - NSUserDefaults
+      # SwiftUI property wrapper that wraps UserDefaults
+      - AppStorage
+    api_type: NSPrivacyAccessedAPICategoryUserDefaults
+    required_reason: CA92.1,1C8F.1,AC6B.1,C56D.1
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Privacy Permission APIs (NOT Required Reason — declared via Info.plist keys)
+  # These require NSUsageDescription entries, not PrivacyInfo.xcprivacy entries.
+  # ──────────────────────────────────────────────────────────────────────────
+
   AdSupport:
     symbols:
       - ASIdentifierManager
       - advertisingIdentifier
       - isAdvertisingTrackingEnabled
+      - ATTrackingManager
     api_type: PrivacyPermission
-    note: Requires App Tracking Transparency (ATT) framework
-    
+
   CoreLocation:
     symbols:
       - CLLocationManager
       - startUpdatingLocation
       - requestLocation
       - requestWhenInUseAuthorization
+      - requestAlwaysAuthorization
     api_type: PrivacyPermission
-    note: Requires location permission in Info.plist
-    
+
   HealthKit:
     symbols:
       - HKHealthStore
       - HKWorkoutType
       - requestAuthorization
+      - HKObjectType
     api_type: PrivacyPermission
-    note: Requires HealthKit entitlement

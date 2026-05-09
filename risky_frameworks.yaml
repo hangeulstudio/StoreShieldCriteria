@@ -1,34 +1,24 @@
-# StoreShield Risky Frameworks Policy
+# StoreShield — Risky Frameworks & Required Manifest SDKs Policy
 #
 # OFFICIAL APPLE SOURCES:
 # - Third-Party SDK Requirements: https://developer.apple.com/support/third-party-SDK-requirements/
 # - App Store Review Guidelines 5.1.2: https://developer.apple.com/app-store/review/guidelines/#tracking
 # - Privacy Manifest Requirements: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
 #
-# METHODOLOGY:
-# Apple does NOT provide an exhaustive list of tracking SDKs. This list is compiled from:
-# 1. SDKs explicitly mentioned in Apple's third-party SDK requirements page
-# 2. SDKs commonly flagged in App Store reviews (based on industry reports)
-# 3. SDKs mentioned in Apple WWDC sessions on privacy (2023-2024)
-# 4. SDKs that use tracking APIs (IDFA, etc.) per Apple's definition
-#
-# IMPORTANT: This is a curated list based on Apple's guidelines, not an official Apple list.
-# Apple requires Privacy Manifest for ANY SDK that uses tracking or sensitive APIs.
-#
-# Last verified: February 14, 2026
-# Next review: May 2026 (or when Apple updates requirements)
-#
-# Frameworks that require PrivacyInfo.xcprivacy manifest per Apple guidelines
-# These SDKs are known to use tracking or sensitive APIs that must be declared
+# Last verified: May 2026
 
+# ────────────────────────────────────────────────────────────────────────────
+# RISKY FRAMEWORKS
+# Analytics & tracking SDKs known to use IDFA or cross-app tracking APIs.
+# These are flagged when NSPrivacyTracking/NSPrivacyTrackingDomains are absent.
+# This is a curated list — Apple does not publish an official tracking SDK list.
+# ────────────────────────────────────────────────────────────────────────────
 risky_frameworks:
-  # Analytics & Tracking SDKs (require NSPrivacyTracking: true in manifest)
+  # Analytics & Attribution
   - AppsFlyer
   - FirebaseAnalytics
   - GoogleAnalytics
   - GoogleAnalyticsForFirebase
-  - FBSDKCoreKit
-  - FBSDKLoginKit
   - Adjust
   - Branch
   - Mixpanel
@@ -36,108 +26,133 @@ risky_frameworks:
   - Segment
   - Braze
   - CleverTap
-  
-  # Additional tracking SDKs
+  # Push & Engagement
   - OneSignal
   - UrbanAirship
   - Localytics
   - Flurry
+  # Error Reporting (may collect device IDs)
   - Crashlytics
   - Fabric
-  
-  # Advertising SDKs
+  # Advertising Networks
   - GoogleMobileAds
   - AdMob
   - FBAudienceNetwork
-  
-  # Note: This list is based on Apple's known tracking SDKs
-  # Apple requires Privacy Manifest for SDKs that:
-  # 1. Use tracking APIs (IDFA, etc.)
-  # 2. Access sensitive user data
-  # 3. Are distributed as binaries (not source code)
+  # Facebook SDK
+  - FBSDKCoreKit
 
-# SDKs that Apple officially requires to include PrivacyInfo.xcprivacy
+# ────────────────────────────────────────────────────────────────────────────
+# REQUIRED MANIFEST SDKs
+# Apple's OFFICIAL list of third-party SDKs that MUST include PrivacyInfo.xcprivacy.
 # Source: https://developer.apple.com/support/third-party-SDK-requirements/
-# Only frameworks matching these prefixes (case-insensitive) are flagged for missing manifests.
-# Internal/first-party frameworks are intentionally excluded.
-# Last verified: May 2026
+# Matching is prefix-based and case-insensitive in ManifestChecker.
+# Last synced with Apple's list: May 2026 (86 SDKs)
+# ────────────────────────────────────────────────────────────────────────────
 required_manifest_sdks:
-  # Apple's official required list
+  # A
   - Abseil
-  - abseil
   - AFNetworking
   - Alamofire
   - AppAuth
+  # B
   - BoringSSL
   - openssl_grpc
+  # C
   - Capacitor
   - Charts
   - connectivity_plus
-  - Crashlytics
+  - Cordova
+  # D
+  - device_info_plus
   - DKImagePickerController
   - DKPhotoGallery
+  # F
+  - FBAEMKit
+  - FBLPromises
   - FBSDKCoreKit
+  - FBSDKCoreKit_Basics
   - FBSDKLoginKit
   - FBSDKShareKit
-  - Firebase
-  - FirebaseCore
-  - FirebaseAnalytics
-  - FirebaseDatabase
-  - FirebaseFirestore
-  - FirebaseMessaging
-  - FirebaseStorage
-  - FirebaseCrashlytics
+  - file_picker
+  - FirebaseABTesting
   - FirebaseAuth
+  - FirebaseCore
+  - FirebaseCoreDiagnostics
+  - FirebaseCoreExtension
+  - FirebaseCoreInternal
+  - FirebaseCrashlytics
+  - FirebaseDynamicLinks
+  - FirebaseFirestore
+  - FirebaseInstallations
+  - FirebaseMessaging
   - FirebaseRemoteConfig
+  - Flutter
+  - flutter_inappwebview
+  - flutter_local_notifications
+  - fluttertoast
+  - FMDB
+  # G
+  - geolocator_apple
   - GoogleDataTransport
-  - GoogleMLKit
-  - MLKit
   - GoogleSignIn
   - GoogleToolboxForMac
   - GoogleUtilities
-  - GoogleWebRTC
-  - gRPC
-  - Grpc
+  - grpcpp
   - GTMAppAuth
   - GTMSessionFetcher
-  - hermes-engine
+  # H
   - hermes
+  # I
+  - image_picker_ios
+  - IQKeyboardManager
+  - IQKeyboardManagerSwift
+  # K
   - Kingfisher
-  - leveldb-library
+  # L
   - leveldb
   - Lottie
-  - Mapsindoors
-  - MarqueeLabel
+  # M
+  - MBProgressHUD
+  # N
   - nanopb
+  # O
+  - OneSignal
+  - OneSignalCore
+  - OneSignalExtension
+  - OneSignalOutcomes
   - OpenSSL
-  - openssl
-  - Phenix
-  - PromisesObjC
-  - PromisesSwift
+  - OrderedSet
+  # P
+  - package_info
+  - package_info_plus
+  - path_provider
+  - path_provider_ios
   - Promises
   - Protobuf
-  - SwiftProtobuf
-  - Realm
+  # R
+  - Reachability
   - RealmSwift
-  - RecaptchaEnterprise
   - RxCocoa
   - RxRelay
   - RxSwift
-  - Sentry
-  - sqlite3
-  - SQLite
-  - Tooltip
-  # Also include known tracking/analytics SDKs from risky_frameworks
-  - AppsFlyer
-  - Adjust
-  - Branch
-  - Mixpanel
-  - Amplitude
-  - Segment
-  - Braze
-  - CleverTap
-  - OneSignal
-  - Flurry
-  - GoogleAnalytics
-  - GoogleMobileAds
-  - AdMob
+  # S
+  - SDWebImage
+  - share_plus
+  - shared_preferences_ios
+  - SnapKit
+  - sqflite
+  - Starscream
+  - SVProgressHUD
+  - SwiftyGif
+  - SwiftyJSON
+  # T
+  - Toast
+  # U
+  - UnityFramework
+  - url_launcher
+  - url_launcher_ios
+  # V
+  - video_player_avfoundation
+  # W
+  - wakelock
+  - webview_flutter_wkwebview
