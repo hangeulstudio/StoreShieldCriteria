@@ -55,3 +55,89 @@ risky_frameworks:
   # 1. Use tracking APIs (IDFA, etc.)
   # 2. Access sensitive user data
   # 3. Are distributed as binaries (not source code)
+
+# SDKs that Apple officially requires to include PrivacyInfo.xcprivacy
+# Source: https://developer.apple.com/support/third-party-SDK-requirements/
+# Only frameworks matching these prefixes (case-insensitive) are flagged for missing manifests.
+# Internal/first-party frameworks are intentionally excluded.
+# Last verified: May 2026
+required_manifest_sdks:
+  # Apple's official required list
+  - Abseil
+  - abseil
+  - AFNetworking
+  - Alamofire
+  - AppAuth
+  - BoringSSL
+  - openssl_grpc
+  - Capacitor
+  - Charts
+  - connectivity_plus
+  - Crashlytics
+  - DKImagePickerController
+  - DKPhotoGallery
+  - FBSDKCoreKit
+  - FBSDKLoginKit
+  - FBSDKShareKit
+  - Firebase
+  - FirebaseCore
+  - FirebaseAnalytics
+  - FirebaseDatabase
+  - FirebaseFirestore
+  - FirebaseMessaging
+  - FirebaseStorage
+  - FirebaseCrashlytics
+  - FirebaseAuth
+  - FirebaseRemoteConfig
+  - GoogleDataTransport
+  - GoogleMLKit
+  - MLKit
+  - GoogleSignIn
+  - GoogleToolboxForMac
+  - GoogleUtilities
+  - GoogleWebRTC
+  - gRPC
+  - Grpc
+  - GTMAppAuth
+  - GTMSessionFetcher
+  - hermes-engine
+  - hermes
+  - Kingfisher
+  - leveldb-library
+  - leveldb
+  - Lottie
+  - Mapsindoors
+  - MarqueeLabel
+  - nanopb
+  - OpenSSL
+  - openssl
+  - Phenix
+  - PromisesObjC
+  - PromisesSwift
+  - Promises
+  - Protobuf
+  - SwiftProtobuf
+  - Realm
+  - RealmSwift
+  - RecaptchaEnterprise
+  - RxCocoa
+  - RxRelay
+  - RxSwift
+  - Sentry
+  - sqlite3
+  - SQLite
+  - Tooltip
+  # Also include known tracking/analytics SDKs from risky_frameworks
+  - AppsFlyer
+  - Adjust
+  - Branch
+  - Mixpanel
+  - Amplitude
+  - Segment
+  - Braze
+  - CleverTap
+  - OneSignal
+  - Flurry
+  - GoogleAnalytics
+  - GoogleMobileAds
+  - AdMob
