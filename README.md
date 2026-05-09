@@ -12,7 +12,7 @@ By **[Hangeul Studio](https://github.com/hangeulstudio)**.
 |------|---------|
 | **manifest.json** | Version, URL of the criteria ZIP, changelog. Read by clients to check for updates. |
 | **risk_scoring.yaml** | Weights per issue type and risk thresholds (low/medium/high). |
-| **risky_frameworks.yaml** | Framework names considered “risky” (tracking/analytics SDKs requiring Privacy Manifest per Apple). |
+| **risky_frameworks.yaml** | Curated tracking/analytics SDK names plus Apple’s official SDK list that requires bundled PrivacyInfo.xcprivacy. |
 | **sensitive_apis.yaml** | Required-reason API types: symbols, `NSPrivacyAccessedAPIType`, reason codes. For detecting undeclared API usage in binaries. |
 
 All lists and weights follow [Apple’s documentation](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files) (Privacy Manifests, Third-Party SDK requirements, Required Reason API). Headers in the YAML files cite sources and methodology.

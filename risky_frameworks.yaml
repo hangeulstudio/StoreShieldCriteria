@@ -46,7 +46,8 @@ risky_frameworks:
 # Apple's OFFICIAL list of third-party SDKs that MUST include PrivacyInfo.xcprivacy.
 # Source: https://developer.apple.com/support/third-party-SDK-requirements/
 # Matching is prefix-based and case-insensitive in ManifestChecker.
-# Last synced with Apple's list: May 2026 (86 SDKs)
+# Last synced with Apple's list: May 2026. Entries are SDK name/prefix checks;
+# Apple's "BoringSSL / openssl_grpc" bullet is represented as two matchable names.
 # ────────────────────────────────────────────────────────────────────────────
 required_manifest_sdks:
   # A

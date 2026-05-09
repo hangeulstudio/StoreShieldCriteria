@@ -2,14 +2,21 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/hangeulstudio/StoreShieldCriteria/schemas/risky_frameworks.schema.json",
   "title": "StoreShield Risky Frameworks",
-  "description": "Schema for risky_frameworks.yaml — SDKs that require a Privacy Manifest.",
+  "description": "Schema for risky_frameworks.yaml — curated tracking/risky SDKs plus Apple's required-manifest SDK list.",
   "type": "object",
-  "required": ["risky_frameworks"],
+  "required": ["risky_frameworks", "required_manifest_sdks"],
   "additionalProperties": false,
   "properties": {
     "risky_frameworks": {
       "type": "array",
-      "description": "Framework/SDK names that trigger a privacy manifest warning.",
+      "description": "Curated framework/SDK names that may indicate tracking, attribution, analytics, or ad-network behavior.",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "required_manifest_sdks": {
+      "type": "array",
+      "description": "Apple's official SDK names that must include PrivacyInfo.xcprivacy and signature when submitted in App Store Connect.",
       "minItems": 1,
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 }

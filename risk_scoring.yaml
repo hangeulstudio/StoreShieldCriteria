@@ -7,8 +7,8 @@
 #
 # METHODOLOGY:
 # Scores are based on Apple's enforcement priorities as stated in their documentation:
-# - Missing main manifest = Automatic rejection (per Apple requirements)
-# - Missing framework manifests = Warning, potential rejection (per Apple requirements)
+# - Missing main manifest when app-code Required Reason APIs are detected = Upload rejection
+# - Missing manifest in an Apple-listed SDK bundle = Upload rejection for listed SDKs
 # - Risky SDKs without declaration = Review flag (per App Store Review Guidelines 5.1.2)
 # - Sensitive APIs without required reason = Potential rejection (per Privacy Manifest docs)
 #
@@ -16,16 +16,16 @@
 # Next review: May 2026
 #
 # Risk weights reflect Apple's enforcement priorities:
-# - Missing Privacy Manifest = Automatic rejection (HIGH)
-# - Missing framework manifests = Warning, potential rejection (MEDIUM)
+# - Missing main Privacy Manifest for app-code Required Reason APIs = Upload rejection (HIGH)
+# - Missing framework manifests for Apple-listed SDKs = Upload rejection (MEDIUM/HIGH by count)
 # - Risky SDKs without declaration = Review flag (MEDIUM)
 # - Sensitive APIs without required reason = Potential rejection (HIGH)
 
 risk_weights:
-  # Missing manifest per framework (Apple requires all third-party SDKs to have manifests)
+  # Missing manifest per Apple-listed SDK bundle.
   missing_manifest_per_framework: 3
   
-  # No main app manifest (Apple requirement - automatic rejection)
+  # No main app manifest when app-code Required Reason APIs are detected.
   no_main_manifest: 10
   
   # Risky framework detected (needs declaration in App Store Connect)
@@ -34,7 +34,7 @@ risk_weights:
   # Sensitive API detected (must have required reason in manifest)
   sensitive_api_per_detection: 2
   
-  # Accessibility Nutrition Labels: needs attention when scan run with --accessibility-nutrition-labels
+  # Accessibility Nutrition Labels: needs attention when nutrition-labels analysis runs (default on)
   # (e.g. app forces Light only, or Info.plist missing). Optional check; only applied when requested.
   accessibility_nutrition_needs_attention: 2
 

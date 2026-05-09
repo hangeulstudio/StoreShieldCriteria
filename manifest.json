@@ -1,11 +1,11 @@
 {
   "manifest_version": "2",
-  "version": "2026.3.0",
-  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.3.0/criteria.zip",
+  "version": "2026.3.1",
+  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.3.1/criteria.zip",
   "checksums": {
     "sensitive_apis.yaml":   "sha256:326046625e27aa2e7ed22757e45e69dfe5a4197b5cfd36072e1c17773851530b",
-    "risky_frameworks.yaml": "sha256:38dc488e3df24acadbc2411bfae7940fa98ed7d49dd43cc5dc4103f4f5c633a0",
-    "risk_scoring.yaml":     "sha256:4e47aaef2e25eac5109c8da65f56f633e3106df3fc626bed1fc1cf62765afd51"
+    "risky_frameworks.yaml": "sha256:a95a2662e8f53996557583a2dafccad9771d91d1c08c35d5bf0ad912290cf658",
+    "risk_scoring.yaml":     "sha256:f4a263ae0432f344129f2cea3c4d6f8f78bf19e0d37e2c70502b6b719498aadb"
   },
-  "changelog": "Fix NSPrivacyAccessedAPICategory* values (was NSPrivacyAccessedAPIType*), complete 86-SDK required manifest list, all Required Reason API symbols and reason codes per Apple docs May 2026."
+  "changelog": "Align risk-scoring wording with Apple privacy manifest scope: main app manifests for app-code Required Reason APIs, SDK manifests for Apple-listed SDK bundles. Schema now validates required_manifest_sdks."
 }
