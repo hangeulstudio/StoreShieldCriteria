@@ -472,37 +472,11 @@ function applyChanges(
 }
 
 // ---------------------------------------------------------------------------
-// Compute checksums + Ed25519 signing
+// Compute checksums
 // ---------------------------------------------------------------------------
 
 function sha256Hex(content: string): string {
   return crypto.createHash("sha256").update(content, "utf8").digest("hex");
-}
-
-function sha256Buffer(data: Buffer): Buffer {
-  return crypto.createHash("sha256").update(data).digest();
-}
-
-/**
- * Sign data with the Ed25519 private key stored in CRITERIA_SIGNING_KEY env var.
- * The env var must contain the PEM-encoded private key.
- * Returns base64-encoded signature, or null if key not available (dry-run / PR-only mode).
- */
-function signZip(zipData: Buffer): string | null {
-  const pem = process.env.CRITERIA_SIGNING_KEY;
-  if (!pem) {
-    log("WARN: CRITERIA_SIGNING_KEY not set — ZIP will not be signed");
-    return null;
-  }
-  try {
-    const privateKey = crypto.createPrivateKey(pem);
-    // Ed25519 signs the raw data directly (no pre-hashing needed by the algorithm)
-    const sig = crypto.sign(null, zipData, privateKey);
-    return sig.toString("base64");
-  } catch (e) {
-    log(`ERROR: Ed25519 signing failed: ${e}`);
-    return null;
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -689,17 +663,10 @@ async function main() {
     `${new Date().toISOString().slice(0, 10)}: ${analysis.summary} ` +
     actionable.map((c) => `[${c.type}] ${c.field}`).join(", ");
 
-  // Build a deterministic ZIP in memory to sign before writing the manifest.
-  // We sign the ZIP that will be attached to the GitHub release.
-  // For the PR, we pre-compute and embed the signature so the manifest is ready.
-  // Actual ZIP is built by the release workflow; signature here covers file contents.
-  const zipSignature = signZip(
-    Buffer.from(
-      Object.fromEntries(
-        CRITERIA_FILES.map((f) => [f, yaml.dump((updatedCriteria as Record<string,unknown>)[f], { lineWidth: 120, sortKeys: false })])
-      ).toString()
-    )
-  );
+  // Signature is intentionally not generated here. It must cover the exact
+  // criteria.zip bytes uploaded to GitHub Releases, so scripts/make-release.sh
+  // adds it during the trusted release step when CRITERIA_SIGNING_KEY is set.
+  const zipSignature = null;
 
   const { newVersion } = writeUpdatedFiles(
     updatedCriteria,

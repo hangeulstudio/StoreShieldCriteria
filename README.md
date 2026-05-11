@@ -53,6 +53,20 @@ https://raw.githubusercontent.com/hangeulstudio/StoreShieldCriteria/main/manifes
 
 Updates to `manifest.json` on `main` (and a matching GitHub Release with `criteria.zip`) are used by clients that poll this URL.
 
+## Security model
+
+The repository can stay public: the criteria are product rules, not runtime secrets. Public criteria also make StoreShield easier to trust because developers can inspect what is being enforced.
+
+If the repository is made private, clients must fetch criteria through an authenticated backend or signed CDN URL. Do not embed GitHub tokens or private repo credentials in the app or CLI.
+
+For tamper resistance, releases should include:
+
+- per-file SHA-256 checksums in `manifest.json`;
+- an Ed25519 `signature` over the exact `criteria.zip` bytes uploaded to the release;
+- review of every automated criteria PR before release.
+
+The signing private key must stay outside the repository. Use `CRITERIA_SIGNING_KEY` only in a trusted release environment.
+
 ---
 
 ## References
