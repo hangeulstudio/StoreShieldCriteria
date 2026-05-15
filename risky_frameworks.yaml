@@ -38,6 +38,15 @@ risky_frameworks:
   - GoogleMobileAds
   - AdMob
   - FBAudienceNetwork
+  - AppLovin
+  - ALAdView
+  - InMobiSDK
+  - IMSdk
+  - IronSource
+  - ISBannerDelegate
+  - MoPub
+  - MPAdView
+  - OathSDK
   # Facebook SDK
   - FBSDKCoreKit
 

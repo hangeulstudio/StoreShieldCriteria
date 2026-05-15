@@ -1,11 +1,11 @@
 {
   "manifest_version": "2",
-  "version": "2026.3.1",
-  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.3.1/criteria.zip",
+  "version": "2026.5.1",
+  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.5.1/criteria.zip",
   "checksums": {
-    "sensitive_apis.yaml":   "sha256:326046625e27aa2e7ed22757e45e69dfe5a4197b5cfd36072e1c17773851530b",
-    "risky_frameworks.yaml": "sha256:a95a2662e8f53996557583a2dafccad9771d91d1c08c35d5bf0ad912290cf658",
+    "sensitive_apis.yaml":   "sha256:bd84d2fdbed9fe8a37d525aa6f48e586d0a44a990c476398fac360663fb3da73",
+    "risky_frameworks.yaml": "sha256:d34869a46e42e6a15c48c0c6b2bf66855810f6086eafe40312c30bd73ff9d521",
     "risk_scoring.yaml":     "sha256:f4a263ae0432f344129f2cea3c4d6f8f78bf19e0d37e2c70502b6b719498aadb"
   },
-  "changelog": "Align risk-scoring wording with Apple privacy manifest scope: main app manifests for app-code Required Reason APIs, SDK manifests for Apple-listed SDK bundles. Schema now validates required_manifest_sdks."
+  "changelog": "Add ad network SDKs (AppLovin, InMobi, IronSource, MoPub, OathSDK) to risky_frameworks. Add LocationUsage group (CLGeocoder, CLVisit) to sensitive_apis."
 }

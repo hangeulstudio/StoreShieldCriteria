@@ -100,6 +100,17 @@ sensitive_apis:
     api_type: NSPrivacyAccessedAPICategoryUserDefaults
     required_reason: CA92.1,1C8F.1,AC6B.1,C56D.1
 
+  LocationUsage:
+    symbols:
+      - CLGeocoder
+      - CLVisit
+      - CLVisitStore
+      - startMonitoringVisits
+      - stopMonitoringVisits
+    api_type: NSPrivacyAccessedAPICategoryLocation
+    required_reason: DDA9.1,8FFB.1
+    note: "Location visit tracking APIs. CLGeocoder can be used for fingerprinting without direct location intent."
+
   # ──────────────────────────────────────────────────────────────────────────
   # Privacy Permission APIs (NOT Required Reason — declared via Info.plist keys)
   # These require NSUsageDescription entries, not PrivacyInfo.xcprivacy entries.
