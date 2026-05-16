@@ -17,6 +17,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "js-yaml";
 import * as crypto from "crypto";
+import { execFileSync } from "child_process";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -479,6 +480,25 @@ function sha256Hex(content: string): string {
   return crypto.createHash("sha256").update(content, "utf8").digest("hex");
 }
 
+function packageCriteriaZip(): Buffer {
+  const distDir = path.join(REPO_ROOT, "dist");
+  const zipPath = path.join(distDir, "criteria.zip");
+  fs.mkdirSync(distDir, { recursive: true });
+  fs.rmSync(zipPath, { force: true });
+  execFileSync("zip", ["-X", "-j", zipPath, ...CRITERIA_FILES], {
+    cwd: REPO_ROOT,
+    stdio: "ignore",
+  });
+  return fs.readFileSync(zipPath);
+}
+
+function signCriteriaZipIfPossible(): string | null {
+  const pem = process.env.CRITERIA_SIGNING_KEY;
+  if (!pem) return null;
+  const privateKey = crypto.createPrivateKey(pem);
+  return crypto.sign(null, packageCriteriaZip(), privateKey).toString("base64");
+}
+
 // ---------------------------------------------------------------------------
 // Bump version
 // ---------------------------------------------------------------------------
@@ -663,18 +683,24 @@ async function main() {
     `${new Date().toISOString().slice(0, 10)}: ${analysis.summary} ` +
     actionable.map((c) => `[${c.type}] ${c.field}`).join(", ");
 
-  // Signature is intentionally not generated here. It must cover the exact
-  // criteria.zip bytes uploaded to GitHub Releases, so scripts/make-release.sh
-  // adds it during the trusted release step when CRITERIA_SIGNING_KEY is set.
-  const zipSignature = null;
-
   const { newVersion } = writeUpdatedFiles(
     updatedCriteria,
     currentManifest,
     bumpType,
-    changelogEntry,
-    zipSignature
+    changelogEntry
   );
+
+  const zipSignature = signCriteriaZipIfPossible();
+  if (zipSignature) {
+    const manifestPath = path.join(REPO_ROOT, "manifest.json");
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
+    manifest["signature"] = zipSignature;
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf8");
+    log("Criteria ZIP signed; manifest signature updated.");
+  } else {
+    log("WARN: CRITERIA_SIGNING_KEY not set — PR will be checksum-only.");
+  }
+
   log(`New version: ${newVersion}`);
 
   // 7. Open PR

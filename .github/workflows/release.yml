@@ -54,7 +54,7 @@ jobs:
         if: steps.check.outputs.exists != 'true'
         run: |
           mkdir -p dist
-          zip -j dist/criteria.zip sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml
+          zip -X -j dist/criteria.zip sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml
           echo "ZIP contents:"
           unzip -l dist/criteria.zip
 
@@ -74,6 +74,29 @@ jobs:
             fi
             echo "✓ $f checksum OK"
           done
+
+      - name: Verify Ed25519 signature
+        if: steps.check.outputs.exists != 'true'
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          import { createPublicKey, verify } from "node:crypto";
+
+          const publicKeyDer = Buffer.from("MCowBQYDK2VwAyEArX+sbbjeW7S2NvR5TxpkOP5t6bYAIVBodcOyjAXzn9M=", "base64");
+          const publicKey = createPublicKey({ key: publicKeyDer, format: "der", type: "spki" });
+          const manifest = JSON.parse(readFileSync("manifest.json", "utf8"));
+          if (!manifest.signature) {
+            console.error("manifest.json missing Ed25519 signature");
+            process.exit(1);
+          }
+          const zipBytes = readFileSync("dist/criteria.zip");
+          const signature = Buffer.from(manifest.signature, "base64");
+          if (!verify(null, zipBytes, publicKey, signature)) {
+            console.error("criteria.zip signature does not match manifest.json");
+            process.exit(1);
+          }
+          console.log("✓ criteria.zip signature OK");
+          NODE
 
       - name: Create GitHub release
         if: steps.check.outputs.exists != 'true'

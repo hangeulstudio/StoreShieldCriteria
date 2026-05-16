@@ -59,6 +59,8 @@ The repository can stay public: the criteria are product rules, not runtime secr
 
 If the repository is made private, clients must fetch criteria through an authenticated backend or signed CDN URL. Do not embed GitHub tokens or private repo credentials in the app or CLI.
 
+Signing note: the Ed25519 public key and verification workflow are safe to keep in this public repository. The private signing key must remain only in `CRITERIA_SIGNING_KEY` GitHub Secrets or an offline release environment.
+
 For tamper resistance, releases should include:
 
 - per-file SHA-256 checksums in `manifest.json`;
