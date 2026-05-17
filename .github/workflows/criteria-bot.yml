@@ -18,6 +18,10 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: criteria-keeper-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   update-criteria:
     runs-on: ubuntu-latest

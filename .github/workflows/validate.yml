@@ -6,15 +6,24 @@ on:
       - "*.yaml"
       - "manifest.json"
       - "schemas/**"
+      - "scripts/**"
+      - ".github/workflows/validate.yml"
   pull_request:
     paths:
       - "*.yaml"
       - "manifest.json"
       - "schemas/**"
+      - "scripts/**"
+      - ".github/workflows/validate.yml"
+
+concurrency:
+  group: validate-criteria-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
