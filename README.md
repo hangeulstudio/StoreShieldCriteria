@@ -11,6 +11,7 @@ By **[Hangeul Studio](https://github.com/hangeulstudio)**.
 | File | Purpose |
 |------|---------|
 | **manifest.json** | Version, URL of the criteria ZIP, changelog. Read by clients to check for updates. |
+| **CHANGELOG.md** | Human-readable criteria changes for the app, website, and support workflow. |
 | **risk_scoring.yaml** | Weights per issue type and risk thresholds (low/medium/high). |
 | **risky_frameworks.yaml** | Curated tracking/analytics SDK names plus Apple’s official SDK list that requires bundled PrivacyInfo.xcprivacy. |
 | **sensitive_apis.yaml** | Required-reason API types: symbols, `NSPrivacyAccessedAPIType`, reason codes. For detecting undeclared API usage in binaries. |
