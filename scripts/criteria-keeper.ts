@@ -483,8 +483,12 @@ function sha256Hex(content: string): string {
 function packageCriteriaZip(): Buffer {
   const distDir = path.join(REPO_ROOT, "dist");
   const zipPath = path.join(distDir, "criteria.zip");
+  const stableDate = new Date("2026-01-01T00:00:00Z");
   fs.mkdirSync(distDir, { recursive: true });
   fs.rmSync(zipPath, { force: true });
+  for (const file of CRITERIA_FILES) {
+    fs.utimesSync(path.join(REPO_ROOT, file), stableDate, stableDate);
+  }
   execFileSync("zip", ["-X", "-j", zipPath, ...CRITERIA_FILES], {
     cwd: REPO_ROOT,
     stdio: "ignore",

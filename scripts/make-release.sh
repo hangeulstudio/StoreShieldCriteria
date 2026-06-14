@@ -13,6 +13,7 @@ CHANGELOG=$(jq -r '.changelog // "Criteria update"' manifest.json)
 
 echo "→ Packaging criteria.zip for $TAG …"
 mkdir -p dist
+touch -t 202601010000 sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml
 zip -X -j dist/criteria.zip sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml
 unzip -l dist/criteria.zip
 
