@@ -1,0 +1,86 @@
+name: Sign Criteria Manifest
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to sign (leave blank to read from manifest.json)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: criteria-sign-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: meta
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION=$(jq -r '.version' manifest.json)
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build criteria.zip
+        run: |
+          mkdir -p dist
+          zip -X -j dist/criteria.zip sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml
+          unzip -l dist/criteria.zip
+
+      - name: Verify SHA-256 matches manifest checksums
+        run: |
+          for f in sensitive_apis.yaml risky_frameworks.yaml risk_scoring.yaml; do
+            expected=$(jq -r --arg f "$f" '.checksums[$f] // empty' manifest.json | sed 's/^sha256://')
+            if [ -z "$expected" ]; then
+              echo "No checksum for $f in manifest"
+              exit 1
+            fi
+            actual=$(sha256sum "$f" | awk '{print $1}')
+            if [ "$actual" != "$expected" ]; then
+              echo "CHECKSUM MISMATCH for $f: expected=$expected actual=$actual"
+              exit 1
+            fi
+            echo "OK $f"
+          done
+
+      - name: Sign criteria.zip into manifest
+        env:
+          CRITERIA_SIGNING_KEY: ${{ secrets.CRITERIA_SIGNING_KEY }}
+        run: |
+          if [ -z "$CRITERIA_SIGNING_KEY" ]; then
+            echo "CRITERIA_SIGNING_KEY secret is missing"
+            exit 1
+          fi
+
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from "node:fs";
+          import { createPrivateKey, sign } from "node:crypto";
+
+          const manifest = JSON.parse(readFileSync("manifest.json", "utf8"));
+          const privateKey = createPrivateKey(process.env.CRITERIA_SIGNING_KEY);
+          manifest.signature = sign(null, readFileSync("dist/criteria.zip"), privateKey).toString("base64");
+          writeFileSync("manifest.json", `${JSON.stringify(manifest, null, 2)}\n`);
+          NODE
+
+      - name: Commit signed manifest
+        run: |
+          if git diff --quiet -- manifest.json; then
+            echo "manifest.json already signed for this zip"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "chore(criteria): sign ${{ steps.meta.outputs.version }}"
+          git push origin HEAD:${GITHUB_REF_NAME}
