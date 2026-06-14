@@ -8,5 +8,5 @@
     "risk_scoring.yaml": "sha256:f4a263ae0432f344129f2cea3c4d6f8f78bf19e0d37e2c70502b6b719498aadb"
   },
   "changelog": "Correct location visit signals to PrivacyPermission heuristics. Keep Required Reason output aligned to Apple's five official categories for iOS 27 beta/Xcode 27 beta validation.",
-  "signature": "eWkqfnfxsvo+nXmvfRMMujYLubZ9YGr6XR4/wHJ/Lwe3fSqIg6m1IXC95jpFxHpziHW4rWiiq0WptVvmwo7fDg=="
+  "signature": "1RdffaEPST/64D9K1RHiZ6jMS5xO1ngSxt0Y2o91WP8peTm9uUz3+Lp1i7cldYLoEASPAWHiJQ5+ElJtOEjwBQ=="
 }
