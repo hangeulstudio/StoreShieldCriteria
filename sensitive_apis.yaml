@@ -10,12 +10,14 @@
 #   <key>NSPrivacyAccessedAPIType</key>
 #   <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
 #
-# Last verified: May 2026 against Apple developer documentation.
+# Last verified: June 2026 against Apple developer documentation.
 
 sensitive_apis:
   # ──────────────────────────────────────────────────────────────────────────
   # Required Reason APIs (must be declared in PrivacyInfo.xcprivacy)
   # These 5 categories are Apple's official Required Reason API types.
+  # Do not add permission-only domains here; they belong in PrivacyPermission
+  # heuristics below and should not emit NSPrivacyAccessedAPIType entries.
   # ──────────────────────────────────────────────────────────────────────────
 
   FileTimestamp:
@@ -50,11 +52,12 @@ sensitive_apis:
       - ProcessInfo.systemUptime
       # C-level
       - mach_absolute_time
-      # sysctl-based (common heuristic in analytics SDKs)
+      # Heuristic: sysctl-based boot time lookups may appear in analytics SDKs.
       - bootTime
       - KERN_BOOTTIME
     api_type: NSPrivacyAccessedAPICategorySystemBootTime
     required_reason: 35F9.1,8FFB.1,3D61.1
+    confidence: heuristic
 
   DiskSpace:
     symbols:
@@ -83,11 +86,12 @@ sensitive_apis:
 
   ActiveKeyboards:
     symbols:
-      # The only official triggering symbol per Apple docs
+      # Heuristic: symbols vary by compiler output; verify call sites.
       - activeInputModes
       - UITextInputMode
     api_type: NSPrivacyAccessedAPICategoryActiveKeyboards
     required_reason: 54BD.1,3EC4.1
+    confidence: heuristic
 
   UserDefaults:
     symbols:
@@ -99,17 +103,17 @@ sensitive_apis:
       - AppStorage
     api_type: NSPrivacyAccessedAPICategoryUserDefaults
     required_reason: CA92.1,1C8F.1,AC6B.1,C56D.1
+    confidence: heuristic
 
-  LocationUsage:
+  LocationVisitTracking:
     symbols:
       - CLGeocoder
       - CLVisit
       - CLVisitStore
       - startMonitoringVisits
       - stopMonitoringVisits
-    api_type: NSPrivacyAccessedAPICategoryLocation
-    required_reason: DDA9.1,8FFB.1
-    note: "Location visit tracking APIs. CLGeocoder can be used for fingerprinting without direct location intent."
+    api_type: PrivacyPermission
+    note: "Location visit tracking APIs require Info.plist usage descriptions and app privacy review. Apple does not define NSPrivacyAccessedAPICategoryLocation as a Required Reason API category."
 
   # ──────────────────────────────────────────────────────────────────────────
   # Privacy Permission APIs (NOT Required Reason — declared via Info.plist keys)

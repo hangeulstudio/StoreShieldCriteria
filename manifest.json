@@ -1,11 +1,11 @@
 {
   "manifest_version": "2",
-  "version": "2026.5.1",
-  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.5.1/criteria.zip",
+  "version": "2026.6.1",
+  "url": "https://github.com/hangeulstudio/StoreShieldCriteria/releases/download/v2026.6.1/criteria.zip",
   "checksums": {
-    "sensitive_apis.yaml":   "sha256:bd84d2fdbed9fe8a37d525aa6f48e586d0a44a990c476398fac360663fb3da73",
-    "risky_frameworks.yaml": "sha256:d34869a46e42e6a15c48c0c6b2bf66855810f6086eafe40312c30bd73ff9d521",
+    "sensitive_apis.yaml":   "sha256:861fe0308221dbaa2db3454108265d5b97893735027e9e8facd720fe51a1bfad",
+    "risky_frameworks.yaml": "sha256:242cd21868af708a205c0ce2f5a41ef78fcec6e5bccf52212f581296c79d759e",
     "risk_scoring.yaml":     "sha256:f4a263ae0432f344129f2cea3c4d6f8f78bf19e0d37e2c70502b6b719498aadb"
   },
-  "changelog": "Add ad network SDKs (AppLovin, InMobi, IronSource, MoPub, OathSDK) to risky_frameworks. Add LocationUsage group (CLGeocoder, CLVisit) to sensitive_apis."
+  "changelog": "Correct location visit signals to PrivacyPermission heuristics. Keep Required Reason output aligned to Apple's five official categories for iOS 27 beta/Xcode 27 beta validation."
 }

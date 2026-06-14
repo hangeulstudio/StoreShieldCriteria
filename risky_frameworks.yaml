@@ -5,7 +5,7 @@
 # - App Store Review Guidelines 5.1.2: https://developer.apple.com/app-store/review/guidelines/#tracking
 # - Privacy Manifest Requirements: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
 #
-# Last verified: May 2026
+# Last verified: June 2026
 
 # ────────────────────────────────────────────────────────────────────────────
 # RISKY FRAMEWORKS
@@ -55,7 +55,7 @@ risky_frameworks:
 # Apple's OFFICIAL list of third-party SDKs that MUST include PrivacyInfo.xcprivacy.
 # Source: https://developer.apple.com/support/third-party-SDK-requirements/
 # Matching is prefix-based and case-insensitive in ManifestChecker.
-# Last synced with Apple's list: May 2026. Entries are SDK name/prefix checks;
+# Last synced with Apple's list: June 2026. Entries are SDK name/prefix checks;
 # Apple's "BoringSSL / openssl_grpc" bullet is represented as two matchable names.
 # ────────────────────────────────────────────────────────────────────────────
 required_manifest_sdks:
